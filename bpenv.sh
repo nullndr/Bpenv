@@ -3,24 +3,20 @@
 
 main() {
   
-  key=()
+  keys=()
   values=()
 
-  while read line; do
-  
-  # allow comments in the .env file
-  if [[ ! ${line:1:0} = "#" ]]; then
-    continue
-  fi 
+  while IFS= read -r line; do
+
+    # allow comments in the .env file
+    if [[ ${line:1:0} = "#" ]]; then
+      continue
+    fi 
+
+    keys+=$(cut -d = -f1 <<< $line)
+    values+=$(cut -d = -f2- <<< $line)
 
   done < .env
-
-  if [[ ${#key[@]} -eq ${#values[@]} ]]; then
-
-  else
-    echo "Error: Invalid .env file"
-    exit 1
-  fi
 }
 
 main
