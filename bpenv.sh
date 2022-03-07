@@ -3,16 +3,25 @@
 
 main() {
 
-  cat .env | while read -r line || [[ -n "$line" ]]; do
+  declare -A data
+  data=()
 
-    # allow comments in the .env file
-    if [[ ${line:1:0} = "#" ]]; then
+  while read -r line || [[ -n "$line" ]]; do
+
+    # allow comments in the .env file and empty lines
+    if [[ ${line:1:0} = "#" ]] || [[ $line = "" ]]; then
       continue
     fi 
-    
+
     key=$(cut -d = -f1 <<< $line)
     value=$(cut -d = -f2- <<< $line)
-  done 
+    data["$key"]="$value"
+  done <<< $(cat .env)
+
+  for key in "${!data[@]}"; do
+    echo "Key in loop: $key"
+    echo "${data[$key]}"
+  done
 }
 
 main
