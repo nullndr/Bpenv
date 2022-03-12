@@ -1,11 +1,10 @@
 
 #! /bin/bash
 
-main() {
+declare -A data
+data=()
 
-  declare -A data
-  data=()
-
+parse_dotenv() {
   while read -r line || [[ -n "$line" ]]; do
 
     # allow comments in the .env file and empty lines
@@ -17,11 +16,40 @@ main() {
     value=$(cut -d = -f2- <<< $line)
     data["$key"]="$value"
   done <<< $(cat .env)
+}
 
-  for key in "${!data[@]}"; do
-    echo "Key in loop: $key"
-    echo "${data[$key]}"
+usage() {
+  echo "\
+Bash Parse ENV v0.0.1
+
+Usage:  bpenv [OPTION]
+"
+}
+
+version() {
+  echo "Bash Parse ENV v0.0.1"
+}
+
+main() {
+  while [[ $# -gt 0 ]]; do
+    case $1 in 
+      -v | --version)
+        version
+        shift
+      ;;
+      -h | --help)
+        usage
+        shift
+      ;;
+      -p | --print) 
+        parse_dotenv
+        echo "Keys  : ${!data[@]}"
+        echo "Values: ${data[@]}"
+        shift
+      ;;
+      -* | --*) ;;
+    esac
   done
 }
 
-main
+main $@
